@@ -1,13 +1,17 @@
 package services;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.sun.net.httpserver.HttpExchange;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.sun.net.httpserver.HttpExchange;
+
+import annotations.Required;
+import exceptions.MissingFieldsException;
 
 public class BodyParser {
 
@@ -27,13 +31,30 @@ public class BodyParser {
             }
         }
         try {
-            return parse(sb.toString(), type);
+            T obj = parse(sb.toString(), type);
+            validateRequiredFields(obj, type);
+            return obj;
         } catch (JsonParseException e) {
             exchange.sendResponseHeaders(400, -1); // Bad Request
             throw new IOException("Request body format error", e);
         } catch (Exception e) {
             exchange.sendResponseHeaders(500, -1); // Internal Server Error
             throw new IOException("Server error processing request", e);
+        }
+    }
+
+    public static <T> void validateRequiredFields(T obj, Class<T> type) throws MissingFieldsException {
+        for (Field field : type.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Required.class)) {
+                field.setAccessible(true);
+                try {
+                    if (field.get(obj) == null) {
+                        throw new MissingFieldsException("Missing required field: " + field.getName());
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new MissingFieldsException("Missing required field: " + field.getName());
+                }
+            }
         }
     }
     

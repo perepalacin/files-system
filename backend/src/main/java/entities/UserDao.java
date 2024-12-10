@@ -15,7 +15,15 @@ public class UserDao {
     public UserDao(String email, String password) {
         this.email = email;
         this.password = password;
-        this.username = email;
+        this.username = generateUsernameFromEmail(email);
+    }
+
+    private String generateUsernameFromEmail (String email) {
+        String[] parts = email.split("\\.");
+        if (parts.length > 1) {
+            return parts[0].substring(0, 1).toUpperCase() + ". " + parts[1].substring(0, 1).toUpperCase() + parts[1].substring(1);
+        }
+        return "Anonymous";
     }
 
 }
