@@ -21,26 +21,17 @@ public class BodyParser {
         return gson.fromJson(json, pojoClass);
     }
 
-    public static <T> T parseRequestBody(HttpExchange exchange, Class<T> type) throws IOException {
+    public static <T> T parseRequestBody(HttpExchange exchange, Class<T> type) throws IOException, JsonParseException {
         InputStream requestBody = exchange.getRequestBody();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody, "UTF-8"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(requestBody, "UTF-8"));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
         }
-        try {
-            T obj = parse(sb.toString(), type);
-            validateRequiredFields(obj, type);
-            return obj;
-        } catch (JsonParseException e) {
-            exchange.sendResponseHeaders(400, -1); // Bad Request
-            throw new IOException("Request body format error", e);
-        } catch (Exception e) {
-            exchange.sendResponseHeaders(500, -1); // Internal Server Error
-            throw new IOException("Server error processing request", e);
-        }
+        T obj = parse(sb.toString(), type);
+        validateRequiredFields(obj, type);
+        return obj;
     }
 
     public static <T> void validateRequiredFields(T obj, Class<T> type) throws MissingFieldsException {

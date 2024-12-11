@@ -3,7 +3,6 @@ package services;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import exceptions.MissingFieldsException;
 import org.junit.Test;
@@ -12,14 +11,12 @@ import entities.dto.UserDto;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-public class BodyParserTestsUserDto {
+public class BodyParserTestsUser {
 
     @Test
     public void testParseUserDto() {
         String json = "{\"email\":\"test@example.com\", \"password\":\"12345\"}";
         UserDto result = BodyParser.parse(json, UserDto.class);
-        Gson gson = new Gson();
-        System.out.println("Parsed Object: " + gson.toJson(result));
         assertEquals("test@example.com", result.getEmail());
         assertEquals("12345", result.getPassword());
     }
@@ -74,4 +71,5 @@ public class BodyParserTestsUserDto {
         }
         verify(exchange).getRequestBody();
     }
+
 }
