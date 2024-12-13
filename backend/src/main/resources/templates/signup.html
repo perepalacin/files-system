@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="${isHtmxRequest} ? false : 'layout'">
+  <meta charset="UTF-8">
+  <title th:text="${title}">Sign-up Page</title>
+  <meta layout:fragment="head" />
+</head>
+
+<body>
+  <div layout:fragment="content" id="auth-card">
+    <div class="card text-center">
+      <div class="card-header">
+        <ul class="nav nav-pills card-header-pills">
+          <li class="nav-item">
+            <a class="nav-link" hx-trigger="click" hx-get="/sign-in" hx-target="#auth-card" hx-swap="outerHTML"
+              hx-replace-url="true">
+              Inicia sessió
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" hx-trigger="click" hx-get="/sign-up" hx-target="#auth-card" hx-swap="outerHTML"
+              hx-replace-url="true">
+              Registra't
+            </a>
+          </li>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Special title treatment</h5>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a href="#" class="btn btn-primary">Go somewhere</a>
+      </div>
+    </div>
+
+  </div>
+</body>
+
+</html>

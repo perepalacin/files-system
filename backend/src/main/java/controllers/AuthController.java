@@ -11,9 +11,11 @@ import exceptions.InvalidPasswordException;
 import org.postgresql.util.PSQLException;
 import services.AuthService;
 import services.BodyParser;
+import views.AuthView;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
 public class AuthController {
@@ -21,6 +23,38 @@ public class AuthController {
     private final AuthService authService = new AuthService();
 
     public AuthController (HttpServer server) {
+
+        server.createContext("/sign-in", (exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                boolean isHtmxRequest = "true".equalsIgnoreCase(
+                        exchange.getRequestHeaders().getFirst("HX-Request")
+                );
+                String response = AuthView.generateLoginView(isHtmxRequest);
+                exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+                exchange.sendResponseHeaders(200, bytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(bytes);
+                os.close();
+            }
+        }));
+
+        server.createContext("/sign-up", (exchange -> {
+            if ("GET".equals(exchange.getRequestMethod())) {
+                boolean isHtmxRequest = "true".equalsIgnoreCase(
+                        exchange.getRequestHeaders().getFirst("HX-Request")
+                );
+                String response = AuthView.generateSignUpView(isHtmxRequest);
+                exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
+                byte[] bytes = response.getBytes(StandardCharsets.UTF_8);
+                exchange.sendResponseHeaders(200, bytes.length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(bytes);
+                os.close();
+            }
+        }));
+
+
         server.createContext("/api/v1/auth/sign-in", (exchange -> {
             if ("POST".equals(exchange.getRequestMethod())) {
                 String response = "";
